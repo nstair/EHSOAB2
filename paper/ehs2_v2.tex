@@ -1,0 +1,246 @@
+%\documentclass[10pt]{article}
+
+\documentclass[aip,jcp,amsmath,amssymb, reprint]{revtex4-1}
+%\documentclass[aip,jcp,amsmath,amssymb, linenumbers, reprint]{revtex4-1}
+%\documentclass[aip,jcp,amsmath,amssymb, preprint]{revtex4-1}
+
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{amsfonts}
+\usepackage{braket}
+\usepackage{multirow}
+\usepackage{threeparttable}
+\usepackage{xspace}
+\usepackage{verbatim}
+\usepackage{mhchem}
+\usepackage{soul}
+\usepackage{ulem}
+\usepackage{siunitx}
+\usepackage{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+\usepackage[colorlinks = true,
+            linkcolor = blue,
+            urlcolor  = black,
+            citecolor = blue,
+            anchorcolor = black]{hyperref}
+
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{xspace}
+\usepackage{ifthen}
+
+\newcommand*{\Eh}{$E_{\rm h}$\xspace}
+\newcommand*{\Ecorr}{$E_{\rm{corr}}$\xspace}
+\newcommand*{\RCMnorm}{$\norm{\pmb{\lambda}_{2}}^{2}_\mathrm{F}$\xspace}
+\newcommand*{\dRCMnorm}{$\norm{\pmb{\delta\lambda}_{2}}^{2}_\mathrm{F}$\xspace}
+\newcommand*{\nfci}{N_\mathcal{H}}
+\newcommand*{\ncomp}{\mathcal{V}_X}
+
+\providecommand{\norm}[1]{\lVert#1\rVert}
+
+\setlength\linenumbersep{6pt}
+
+\newcommand*\patchAmsMathEnvironmentForLineno[1]{%
+  \expandafter\let\csname old#1\expandafter\endcsname\csname #1\endcsname
+  \expandafter\let\csname oldend#1\expandafter\endcsname\csname end#1\endcsname
+  \renewenvironment{#1}%
+     {\linenomath\csname old#1\endcsname}%
+     {\csname oldend#1\endcsname\endlinenomath}}% 
+\newcommand*\patchBothAmsMathEnvironmentsForLineno[1]{%
+  \patchAmsMathEnvironmentForLineno{#1}%
+  \patchAmsMathEnvironmentForLineno{#1*}}%
+\AtBeginDocument{%
+\patchBothAmsMathEnvironmentsForLineno{equation}%
+\patchBothAmsMathEnvironmentsForLineno{align}%
+\patchBothAmsMathEnvironmentsForLineno{flalign}%
+\patchBothAmsMathEnvironmentsForLineno{alignat}%
+\patchBothAmsMathEnvironmentsForLineno{gather}%
+\patchBothAmsMathEnvironmentsForLineno{multline}%
+}
+
+% Make this look more like JCP
+\usepackage{newtxtext,newtxmath}
+\usepackage[scaled=1.0]{helvet}
+\usepackage[compact]{titlesec}
+\usepackage{xcolor}
+\usepackage{notes2bib}
+\bibnotesetup{ note-name = , use-sort-key = false}
+% Format section header
+\titleformat{\section}
+  {\normalfont\sffamily\bfseries}
+  {\thesection.}{0.5 em}{\MakeTextUppercase}
+\titlespacing{\section}{0pt}{12pt}{12pt}
+
+\titleformat{\subsection}[block]
+  {\normalfont\sffamily\bfseries}
+  {\thesubsection.}{0.5 em}{}
+\titlespacing{\subsection}{0pt}{12pt}{8pt}
+
+\titleformat{\subsubsection}[block]
+  {\normalfont\itshape\sffamily\bfseries\raggedright}
+  {\arabic{subsubsection}.}{0.5 em}{}
+\titlespacing{\subsubsection}{0pt}{8pt}{8pt}
+
+\begin{document}
+
+\title{Exploring Hilbert space on a budget II}
+\author{Author, Authors}
+\email{authors@calpoly.edu}
+\affiliation{Department of Physics, California Polytechnic State University, San Luis Obispo, CA, 93410}
+
+\begin{abstract}
+This work explores the ability of quantum computational algorithms to represent the information content of Full Configuration Interaction (FCI) wave functions.
+
+\end{abstract}
+
+\linenumbersep=24pt
+
+\maketitle
+
+\section{\label{sec:intro}Introduction}
+
+This is an introduction. It should include the following subtopics:
+
+\begin{enumerate}
+\item A review of the strong correlation problem (relevance, and difficulty for classical methods, discuss findings from EHS-1).
+\item A discussion of the relevance of quantum algorithms to combat this problem, inherent circumvention of storage.
+\item A discussion of the outstanding need for inter-comparison between the now wide variety of quantum algorithm classes that exist, resource estimation and accuracy, and comparison to classical methods. Investigate the quantum advantage boundary.
+\item Also a need to compare the border of near-term and fault tolerant algorithms (not done often or at all).
+\item Overview of previous quantum benchmark students, overview of the quantum algorithms we implemented, and classical algorithms from EHS-1,
+\item Summary of findings (obviously later).
+\end{enumerate}
+
+This is a citation: \cite{Schriber2016Adaptive}
+
+\section{\label{sec:theory}Theory}
+
+\subsection{FCI wave functions and strong correlation}
+\label{sec:fci_wf}
+Given a basis of $K$ spin orbitals $\{\psi_p\}$ with $p = 1,\ldots,K$, we indicate a generic $N$-electron determinant $\ket{\psi_{i_1}\cdots\psi_{i_N}}$ using the notation $\ket{\Phi_I}$ where the multindex $I = (i_1,\ldots,i_N)$ represents an ordered list of indices ($i_1 < i_2 < \ldots < i_N$).
+The set of $N$-electron determinants ($\mathcal{H}_N$) forms a Hilbert space of dimension $|\mathcal{H}_N| = \nfci$.
+Using this notation, the FCI wave function is written as a linear combination of determinants, each parameterized by a coefficient ($C_{i_1,\ldots,i_N} \equiv C_{I} $)
+\begin{equation}
+\ket{\Psi_{\text{FCI}}} = \sum_{i_1 < i_2 < \ldots < i_N}^{K} C_{i_1 \cdots i_N} \ket{\Phi_{i_1 \cdots i_N}}  = \sum_{I}^{\nfci} C_{I} \ket{\Phi_{I}} 
+\label{eq:fci_def1}.
+\end{equation}
+An equivalent way to express the FCI wave function employs occupation vectors.
+In this representation, each determinant $\ket{\Phi_I}$ is associated with a vector of length $K$, $\ket{\mathbf{n}} =\ket{n_1, n_2, \ldots, n_K}$, where $n_i \in \{0,1\}$ is the occupation number of spin orbital $\psi_i$.
+The FCI wave function represented in the occupation vector form is given by
+\begin{equation}
+\ket{\Psi_{\text{FCI}}}  = \sum_{\{  n_{i}\}} C_{n_{1} \ldots n_{K}} \ket{n_{1} \ldots n_{K}}
+= \sum_{\mathbf{n}} C_{\mathbf{n}} \ket{\mathbf{n}}
+\end{equation}
+where the sum over all occupation vectors ($\{  n_{i}\} \equiv \mathbf{n}$) is restricted to $N$-electron determinants ($\sum_i n_j = N$) of given spin and spatial symmetry.
+
+\subsection{Resources for Quantum Algorithms}
+Overview of what contributes to runtime and accuracy.
+
+\subsubsection{Classical Parameter Optimization}
+Can probably keep some of this, will likely use here.
+For a systematically improvable method $X$ we indicate the energy computed using $N_{\rm{par}}$  parameters as $E_X(N_{\rm{par}})$. We then define the accuracy volume, $\ncomp(\alpha)$, to be the smallest number of parameters such that the error per electron with respect to the FCI energy ($E_\mathrm{FCI}$) is less than or equal to $10^{-\alpha}$:
+\begin{equation}
+\label{eq:Vx}
+\ncomp(\alpha) = N_{\rm{par}} : \frac{ |E_X(N_{\rm{par}}) - E_\mathrm{FCI}|}{N} \leq  10^{-\alpha}  \; E_\mathrm{h}.
+\end{equation}
+
+\subsubsection{Circuit Depth (NISQ and FT)}
+
+\subsubsection{Measurement}
+
+\subsubsection{Hamiltonian Factorization}
+
+
+\subsection{Quantum Eigensolvers}
+General ideal of optimized unitary, discuss discrepancy between PQE and VQE
+
+Now list Ansatz
+
+\subsubsection{dUCC}
+
+particle hole dUCC, k-upG-UCCSD, AGP, symmetry adaptation.
+Mention that some are introduced in layers
+
+\subsubsection{Orbital Fabric}
+
+\subsubsection{Tensor Network}
+
+\subsubsection{Qubit CC}
+
+\subsubsection{Hardware Efficient Ansatz}
+
+\subsubsection{LDCA}
+
+\subsubsection{Selected QE}
+
+S-PQE, ADAPT, Iterative Qubit CC
+
+
+
+
+\subsection{Quantum Imaginary Time Evolution}
+
+\subsubsection{Fermionic 1st order QITE}
+
+\subsubsection{Fermionic 1st order MVP QITE}
+
+
+
+\subsection{Quantum Subspace Diagonalization}
+
+\subsubsection{QSE}
+
+\subsubsection{NO-VQE}
+
+\subsubsection{MC-VQE}
+
+\subsubsection{QLanczos}
+
+\subsubsection{QKrylov}
+
+\subsubsection{QDavidson}
+
+\subsection{Quantum Phase Estimation}
+
+
+
+
+\section{Hydrogen Model Systems}
+
+
+
+
+\section{Computational Considerations}
+
+\section{Results}
+
+\section{Conclusions}
+
+\bibliography{bibliography,extra}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
